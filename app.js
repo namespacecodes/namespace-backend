@@ -1,9 +1,10 @@
+require('dotenv').config()
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const connection=require('./sqlconn')
+const {connection,db}=require('./sqlconn')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var cors = require('cors')
@@ -24,24 +25,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 
-// Execute the query
-connection.query("select * from users", (queryError, results) => {
-  if (queryError) {
-    console.error('Error executing query:', queryError);
-    return;
-  }
-
-  // Process the query results
-  console.log('Query Results:');
-  console.log(results);
-
-  // Close the connection when done
-  // connection.end();
-});
-
+db.getAllUsers().then((res)=>{
+  console.log(res);
+})
 
 // Close the connection when done
-connection.end();
+//connection.end();
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);

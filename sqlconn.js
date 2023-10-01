@@ -4,7 +4,7 @@ const mysql = require('mysql2');
 const connection = mysql.createConnection({
     host: '127.0.0.1',
     user: 'root',
-    password: 'namespace@1',
+    password: process.env.DB_PASSWORD,
     database: 'namespace',
   });
   
@@ -16,4 +16,37 @@ const connection = mysql.createConnection({
     console.log('Connected to MySQL database.');
   });
   
-  module.exports=connection;
+  const db={}
+  db.getAllUsers = () =>{
+    return new Promise((resolve, reject)=>{
+      connection.query('SELECT * FROM users ', (error, users)=>{
+            if(error){
+                return reject(error);
+            }
+            return resolve(users);
+        });
+    });
+};
+  db.getUserByEmail = (email) =>{
+    return new Promise((resolve, reject)=>{
+      connection.query('SELECT * FROM users WHERE email = ?', [email], (error, users)=>{
+            if(error){
+                return reject(error);
+            }
+            return resolve(users[0]);
+        });
+    });
+};
+db.insertUser = (name,email,type) =>{
+  return new Promise((resolve, reject)=>{
+    connection.query('INSERT INTO users (name,email,type) VALUES (?,?,?)', [name,email,type], (error, res)=>{
+          if(error){
+              return reject(error);
+          }
+          return resolve(res);
+      });
+  });
+};
+
+
+  module.exports={connection,db};
