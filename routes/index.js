@@ -59,6 +59,20 @@ router.post('/googleLogin', function(req, res) {
     })
 });
 
+router.post('/waitList',(req,res)=>{
+
+  connection.query('INSERT INTO waitList (name,email) VALUES (?,?)', [req.body.name,req.body.email], (error, ress)=>{
+    if(error){
+      if(error.sqlMessage &&error.sqlMessage.includes('Duplicate entry')){
+        return res.status(400).send({"status":"Email already Exists"})
+      }
+      return res.status(400).send({"status":"error"})
+        //return reject(error);
+    }
+    return res.send({"status":"Success"})
+});
+});
+
 router.post('/testAuth',authenticateToken,(req,res)=>{
   res.send({"status":"sdfdfc"})
 

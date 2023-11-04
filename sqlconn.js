@@ -2,10 +2,10 @@ const mysql = require('mysql2');
 
 // Create a connection to the MySQL database
 const connection = mysql.createConnection({
-    host: '127.0.0.1',
-    user: 'root',
-    password: process.env.DB_PASSWORD,
-    database: 'namespace',
+    host: 'be2z1gncsx570qduimrx-mysql.services.clever-cloud.com', //'127.0.0.1',
+    user: 'ugslsed8pcscmxhw',//'root',
+    password: 'AdtOT17v8phPRzagMXVM',//process.env.DB_PASSWORD,
+    database:'be2z1gncsx570qduimrx' //'namespace',
   });
   
   connection.connect((err) => {
@@ -47,6 +47,7 @@ db.insertUser = (name,email,type) =>{
       });
   });
 };
+
 
 
   module.exports={connection,db};

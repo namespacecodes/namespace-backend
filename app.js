@@ -23,11 +23,13 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-
-
-db.getAllUsers().then((res)=>{
+connection.query('select * from waitList', (error, res)=>{
   console.log(res);
-})
+});
+
+// db.getAllUsers().then((res)=>{
+//   console.log(res);
+// })
 
 // Close the connection when done
 //connection.end();
