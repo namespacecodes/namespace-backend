@@ -66,7 +66,7 @@ router.post('/waitList',(req,res)=>{
       if(error.sqlMessage &&error.sqlMessage.includes('Duplicate entry')){
         return res.status(400).send({"status":"Email already Exists"})
       }
-      return res.status(400).send({"status":"error"})
+      return res.status(400).send({"status":"Failed To Join the WaitingList, Please try Again later"})
         //return reject(error);
     }
     return res.send({"status":"Success"})
@@ -91,6 +91,37 @@ router.post('/testAuth',authenticateToken,(req,res)=>{
 // });
 
 
+router.put('/updateSocialMediaProfile',async(req,res)=>{
+  try {
+      var data=await db.updateSocialMediaProfile(req.body.userId,req.body.socialMediaName,req.body.profileLink)
+      return res.send({"status":"Success"})
+  } catch (error) {
+    console.log(error);
+      return res.status(400).send({"status":"Failed to update Profile"})
+  }
 
+})
+
+router.put('/updateService',async(req,res)=>{
+  try {
+      var data=await db.updateSerive(req.body.userId,req.body.serviceName,req.body.description,req.body.moreInfo,req.body.price,req.body.duration)
+      return res.send({"status":"Success"})
+  } catch (error) {
+    console.log(error);
+      return res.status(400).send({"status":"Failed to update Serive"})
+  }
+
+})
+
+router.put('/updateAvailability',async(req,res)=>{
+  try {
+      var data=await db.updateAvailability(req.body.userId,req.body.day,req.body.time)
+      return res.send({"status":"Success"})
+  } catch (error) {
+    console.log(error);
+      return res.status(400).send({"status":"Failed to update availability"})
+  }
+
+})
 
 module.exports = router;
