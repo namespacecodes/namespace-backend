@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();  
 const jwt = require('jsonwebtoken');   
 const {OAuth2Client} = require('google-auth-library');
-const {connection,db}=require('../sqlconn')
+const {db}=require('../sqlconn')
 
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -52,15 +52,15 @@ router.post('/googleLogin', function(req, res) {
     const accessToken = jwt.sign({ userid: user.userid,name:user.name,email:user.name}, process.env.ACCESS_TOKEN_SECERET,{expiresIn:'2h'});
     console.log(accessToken);
 
-    res.status(200).send({"status":"success",accessToken})
+    res.status(200).send({"status":"success",accessToken,userId:user.userid})
     }).catch((err)=>{
        console.log(err)
        res.send({"status":"error"})
     })
 });
 
-router.post('/waitList',(req,res)=>{
-
+router.post('/waitList',async(req,res)=>{
+  const connection=await db.createConnection()
   connection.query('INSERT INTO waitList (name,email) VALUES (?,?)', [req.body.name,req.body.email], (error, ress)=>{
     if(error){
       if(error.sqlMessage &&error.sqlMessage.includes('Duplicate entry')){
@@ -71,6 +71,9 @@ router.post('/waitList',(req,res)=>{
     }
     return res.send({"status":"Success"})
 });
+
+connection.release();
+
 });
 
 router.post('/testAuth',authenticateToken,(req,res)=>{
@@ -91,37 +94,21 @@ router.post('/testAuth',authenticateToken,(req,res)=>{
 // });
 
 
-router.put('/updateSocialMediaProfile',async(req,res)=>{
-  try {
-      var data=await db.updateSocialMediaProfile(req.body.userId,req.body.socialMediaName,req.body.profileLink)
-      return res.send({"status":"Success"})
-  } catch (error) {
-    console.log(error);
-      return res.status(400).send({"status":"Failed to update Profile"})
-  }
 
-})
 
-router.put('/updateService',async(req,res)=>{
-  try {
-      var data=await db.updateSerive(req.body.userId,req.body.serviceName,req.body.description,req.body.moreInfo,req.body.price,req.body.duration)
-      return res.send({"status":"Success"})
-  } catch (error) {
-    console.log(error);
-      return res.status(400).send({"status":"Failed to update Serive"})
-  }
 
-})
+// router.put('/updateAvailability',async(req,res)=>{
+//   try {
+//       var data=await db.updateAvailability(req.body.userId,req.body.day,req.body.time)
+//       return res.send({"status":"Success"})
+//   } catch (error) {
+//     console.log(error);
+//       return res.status(400).send({"status":"Failed to update availability"})
+//   }
 
-router.put('/updateAvailability',async(req,res)=>{
-  try {
-      var data=await db.updateAvailability(req.body.userId,req.body.day,req.body.time)
-      return res.send({"status":"Success"})
-  } catch (error) {
-    console.log(error);
-      return res.status(400).send({"status":"Failed to update availability"})
-  }
-
-})
+// })
 
 module.exports = router;
+
+
+//get name , 
