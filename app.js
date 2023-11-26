@@ -4,11 +4,11 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-const {db}=require('./sqlconn')
+const { db } = require('./sqlconn')
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
-var usersRouter = require('./routes/socialmedia');
-var usersRouter = require('./routes/services');
+var socialmediaRouter = require('./routes/socialmedia');
+var servicesRouter = require('./routes/services');
 var cors = require('cors')
 
 var app = express();
@@ -30,7 +30,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // });
 
 // db.getAllUsers().then((res)=>{
-  // console.log(res);
+// console.log(res);
 // })
 
 // Close the connection when done
@@ -38,16 +38,16 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
-app.use('/socialmedia', usersRouter);
-app.use('/service', usersRouter);
+app.use('/socialmedia', socialmediaRouter);
+app.use('/service', servicesRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
@@ -58,4 +58,3 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
- 
