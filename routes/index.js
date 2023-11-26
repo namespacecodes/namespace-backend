@@ -1,83 +1,83 @@
 var express = require('express');
-var router = express.Router();  
-const jwt = require('jsonwebtoken');   
-const {OAuth2Client} = require('google-auth-library');
-const {db}=require('../sqlconn')
+var router = express.Router();
+const jwt = require('jsonwebtoken');
+const { OAuth2Client } = require('google-auth-library');
+const { db } = require('../sqlconn')
 
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
   if (authHeader) {
-      const token = authHeader.split(' ')[1];
-      jwt.verify(token, process.env.ACCESS_TOKEN_SECERET, (err, user) => {
-          if (err) {
-            console.log(err.message)
-              return res.sendStatus(403);
-          }
-          req.user = user;
-          next();
-      });
-  }else {
-      res.sendStatus(401);
+    const token = authHeader.split(' ')[1];
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECERET, (err, user) => {
+      if (err) {
+        console.log(err.message)
+        return res.sendStatus(403);
+      }
+      req.user = user;
+      next();
+    });
+  } else {
+    res.sendStatus(401);
   }
 };
 
 
 async function verify(req) {
-    const client = new OAuth2Client();
-    const ticket = await client.verifyIdToken({
-        idToken: req.body.credential,
-        audience: req.body.clientId,  
-    });
-    const payload = ticket.getPayload();
-    return payload 
+  const client = new OAuth2Client();
+  const ticket = await client.verifyIdToken({
+    idToken: req.body.credential,
+    audience: req.body.clientId,
+  });
+  const payload = ticket.getPayload();
+  return payload
 }
 
 
 
 //Routes
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', function (req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
 
-router.post('/googleLogin', function(req, res) {
-  verify(req).then(async(payload)=>{
-    const usr= await db.getUserByEmail(payload.email)
+router.post('/googleLogin', function (req, res) {
+  verify(req).then(async (payload) => {
+    const usr = await db.getUserByEmail({ email: payload.email })
     console.log(usr);
-    if(!usr){
-      await  db.insertUser(payload.name,payload.email,"Google Auth")
+    if (!usr) {
+      await db.insertUser(payload.name, payload.email, "Google Auth")
     }
-    const user= await db.getUserByEmail(payload.email)
-    const accessToken = jwt.sign({ userid: user.userid,name:user.name,email:user.name}, process.env.ACCESS_TOKEN_SECERET,{expiresIn:'2h'});
+    const user = await db.getUserByEmail({ email: payload.email })
+    const accessToken = jwt.sign({ userid: user.userid, name: user.name, email: user.name }, process.env.ACCESS_TOKEN_SECERET, { expiresIn: '2h' });
     console.log(accessToken);
 
-    res.status(200).send({"status":"success",accessToken,userId:user.userid})
-    }).catch((err)=>{
-       console.log(err)
-       res.send({"status":"error"})
-    })
+    res.status(200).send({ "status": "success", accessToken, userId: user.userid })
+  }).catch((err) => {
+    console.log(err)
+    res.send({ "status": "error" })
+  })
 });
 
-router.post('/waitList',async(req,res)=>{
-  const connection=await db.createConnection()
-  connection.query('INSERT INTO waitList (name,email) VALUES (?,?)', [req.body.name,req.body.email], (error, ress)=>{
-    if(error){
-      if(error.sqlMessage &&error.sqlMessage.includes('Duplicate entry')){
-        return res.status(400).send({"status":"Email already Exists"})
+router.post('/waitList', async (req, res) => {
+  const connection = await db.createConnection()
+  connection.query('INSERT INTO waitList (name,email) VALUES (?,?)', [req.body.name, req.body.email], (error, ress) => {
+    if (error) {
+      if (error.sqlMessage && error.sqlMessage.includes('Duplicate entry')) {
+        return res.status(400).send({ "status": "Email already Exists" })
       }
-      return res.status(400).send({"status":"Failed To Join the WaitingList, Please try Again later"})
-        //return reject(error);
+      return res.status(400).send({ "status": "Failed To Join the WaitingList, Please try Again later" })
+      //return reject(error);
     }
-    return res.send({"status":"Success"})
+    return res.send({ "status": "Success" })
+  });
+
+  connection.release();
+
 });
 
-connection.release();
-
-});
-
-router.post('/testAuth',authenticateToken,(req,res)=>{
-  res.send({"status":"sdfdfc"})
+router.post('/testAuth', authenticateToken, (req, res) => {
+  res.send({ "status": "sdfdfc" })
 
 })
 
@@ -90,7 +90,7 @@ router.post('/testAuth',authenticateToken,(req,res)=>{
 //     }
 //     res.status(200).send({"status":"Logout successful"});
 //   })
-  
+
 // });
 
 
