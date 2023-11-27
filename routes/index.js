@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
-const { db } = require('../sqlconn')
+const { db,runQuery } = require('../sqlconn')
 
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -43,19 +43,19 @@ router.get('/', function (req, res, next) {
 
 router.post('/googleLogin', function (req, res) {
   verify(req).then(async (payload) => {
-    const usr = await db.getUserByEmail({ email: payload.email })
-    console.log(usr);
+    const usr = await runQuery("getUserByEmail",{ email: payload.email }) 
     if (!usr) {
-      await db.insertUser(payload.name, payload.email, "Google Auth")
+      await  runQuery("insertUser",{name:payload.name, email:payload.email,type:"Google Auth"})
     }
-    const user = await db.getUserByEmail({ email: payload.email })
+    
+    const user =await runQuery("getUserByEmail",{ email: payload.email }) 
     const accessToken = jwt.sign({ userid: user.userid, name: user.name, email: user.name }, process.env.ACCESS_TOKEN_SECERET, { expiresIn: '2h' });
     console.log(accessToken);
 
     res.status(200).send({ "status": "success", accessToken, userId: user.userid })
   }).catch((err) => {
     console.log(err)
-    res.send({ "status": "error" })
+    res.status(400).send({ "status": "error" })
   })
 });
 
