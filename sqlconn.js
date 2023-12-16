@@ -49,7 +49,7 @@ db.createConnection = () => {
 
 db.getAllUsers = (connection) => {
   return new Promise((resolve, reject) => {
-    connection.query('SELECT * FROM users ', (error, users) => {
+    connection.query('SELECT user_id,name,email,bio,more_info,user_route FROM users ', (error, users) => {
       if (error) {
         return reject(error);
       }
@@ -60,7 +60,18 @@ db.getAllUsers = (connection) => {
 
 db.getUserByEmail = (connection, reqBody) => {
   return new Promise((resolve, reject) => {
-    connection.query('SELECT * FROM users WHERE email = ?', [reqBody.email], (error, users) => {
+    connection.query('SELECT user_id,name,email,bio,more_info,user_route FROM users WHERE email = ?', [reqBody.email], (error, users) => {
+      if (error) {
+        return reject(error);
+      }
+      return resolve(users[0]);
+    });
+  });
+};
+
+db.getUserByUserRoute = (connection, reqBody) => {
+  return new Promise((resolve, reject) => {
+    connection.query('SELECT user_id,name,email,bio,more_info,user_route FROM users WHERE user_route = ?', [reqBody.user_route], (error, users) => {
       if (error) {
         return reject(error);
       }
@@ -71,7 +82,7 @@ db.getUserByEmail = (connection, reqBody) => {
 
 db.getUserById = (connection, reqBody) => {
   return new Promise((resolve, reject) => {
-    connection.query('SELECT * FROM users WHERE user_id = ?', [reqBody.user_id], (error, users) => {
+    connection.query('SELECT user_id,name,email,bio,more_info,user_route FROM users WHERE user_id = ?', [reqBody.user_id], (error, users) => {
       if (error) {
         return reject(error);
       }

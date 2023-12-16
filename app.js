@@ -9,6 +9,7 @@ var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var socialmediaRouter = require('./routes/socialmedia');
 var servicesRouter = require('./routes/services');
+var profileRouter = require('./routes/profile');
 var cors = require('cors')
 
 var app = express();
@@ -40,6 +41,7 @@ app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/socialmedia', socialmediaRouter);
 app.use('/service', servicesRouter);
+app.use('/profile', profileRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
