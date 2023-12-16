@@ -9,6 +9,7 @@ router.get('/:userRoute',async(req,res)=>{
         return res.send({"status":"Success",data})
     } catch (error) {
         return res.status(400).send({"status":"Failed to get Profile"})
+        
     }
 })
 
