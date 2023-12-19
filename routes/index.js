@@ -49,7 +49,7 @@ router.post('/googleLogin', function (req, res) {
     }
     
     const user =await runQuery("getUserByEmail",{ email: payload.email }) 
-    const accessToken = jwt.sign({ userid: user.userid, name: user.name, email: user.name }, process.env.ACCESS_TOKEN_SECERET, { expiresIn: '2h' });
+    const accessToken = jwt.sign({ userid: user.user_id, name: user.name, email: user.name }, process.env.ACCESS_TOKEN_SECERET, { expiresIn: '2h' });
     console.log(accessToken);
 
     res.status(200).send({ "status": "success", accessToken, userId: user.userid })
