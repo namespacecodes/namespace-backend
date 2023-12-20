@@ -52,7 +52,7 @@ router.post('/googleLogin', function (req, res) {
     const accessToken = jwt.sign({ userid: user.user_id, name: user.name, email: user.name }, process.env.ACCESS_TOKEN_SECERET, { expiresIn: '2h' });
     console.log(accessToken);
 
-    res.status(200).send({ "status": "success", accessToken, userId: user.userid })
+    res.status(200).send({ "status": "success", accessToken, userId: user.user_id })
   }).catch((err) => {
     console.log(err)
     res.status(400).send({ "status": "error" })
